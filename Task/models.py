@@ -1,5 +1,7 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+import pytz
+import datetime
 
 
 class TaskEntry(models.Model):
@@ -17,6 +19,10 @@ class TaskEntry(models.Model):
     Task_schedule = models.PositiveIntegerField(default=1,
                                                 validators=[MinValueValidator(1), MaxValueValidator(5)])
 
+    Task_create = models.DateTimeField(auto_now_add=True,blank=True)
+    # datetime.datetime.utcnow().replace(tzinfo=utc)
+    #Task_create = models.DateTimeField(default=datetime.datetime.now(pytz.timezone('Asia/Kolkata')))
+
     MINIMUM_RANGE = 1
     MAXIMUM_RANGE = 5
     RECORD_COUNT_ZERO = 0
@@ -31,6 +37,7 @@ class TaskEntry(models.Model):
         self.Task_weight = Task_weight
         self.Task_schedule = Task_schedule
 
+        print("Date and time", datetime.datetime.now(pytz.timezone('Asia/Kolkata')))
         if not Task_dependant == 'NULL':
             if self.check_record_count_fk(Task_dependant):
                 self.Task_dependant_id = Task_dependant
@@ -57,7 +64,7 @@ class TaskEntry(models.Model):
         else:
             return False
 
-    def check_record_count_fk(self,Task_dependant):
+    def check_record_count_fk(self, Task_dependant):
 
         if TaskEntry.objects.filter(pk=Task_dependant).count() == self.RECORD_COUNT_ZERO:
             return False
@@ -81,44 +88,43 @@ class TaskEntry(models.Model):
 
     def update_record(self, Task_id, Task_des, Task_priority, Task_weight, Task_schedule, Task_dependant):
 
-            self.Task_id = Task_id
-            self.Task_des = Task_des
-            self.Task_priority = Task_priority
-            self.Task_weight = Task_weight
-            self.Task_schedule = Task_schedule
+        self.Task_id = Task_id
+        self.Task_des = Task_des
+        self.Task_priority = Task_priority
+        self.Task_weight = Task_weight
+        self.Task_schedule = Task_schedule
 
-            if not Task_dependant == 'NULL':
-                if self.check_record_count_fk(Task_dependant):
-                    self.Task_dependant_id = Task_dependant
-                else:
-                    return "Records Have constraint errors1"
-
-            if self.check_priority() \
-                    and self.check_weight() \
-                    and self.check_schedule():
-
-                try:
-
-                    if Task_dependant == 'NULL':
-                        TaskEntry.objects.filter(pk=self.Task_id).update(
-                            Task_des=self.Task_des,
-                            Task_priority=self.Task_priority,
-                            Task_weight=self.Task_weight,
-                            Task_schedule=self.Task_schedule
-                        )
-                    else:
-                        TaskEntry.objects.filter(pk=self.Task_id).update(
-                            Task_des=self.Task_des,
-                            Task_priority=self.Task_priority,
-                            Task_weight=self.Task_weight,
-                            Task_schedule=self.Task_schedule,
-                            Task_dependant_id=self.Task_dependant
-                        )
-                except Exception as e:
-                    return "Records Have constraint errors2"+str(e)
-
-                return "Record Inserted"
+        if not Task_dependant == 'NULL':
+            if self.check_record_count_fk(Task_dependant):
+                self.Task_dependant_id = Task_dependant
             else:
-                return "Records Have constraint errors3"
+                return "Records Have constraint errors1"
 
+        if self.check_priority() \
+                and self.check_weight() \
+                and self.check_schedule():
 
+            try:
+
+                if Task_dependant == 'NULL':
+                    TaskEntry.objects.filter(pk=self.Task_id).update(
+                        Task_des=self.Task_des,
+                        Task_priority=self.Task_priority,
+                        Task_weight=self.Task_weight,
+                        Task_schedule=self.Task_schedule,
+                        Task_dependant_id=None
+                    )
+                else:
+                    TaskEntry.objects.filter(pk=self.Task_id).update(
+                        Task_des=self.Task_des,
+                        Task_priority=self.Task_priority,
+                        Task_weight=self.Task_weight,
+                        Task_schedule=self.Task_schedule,
+                        Task_dependant_id=self.Task_dependant
+                    )
+            except Exception as e:
+                return "Records Have constraint errors2" + str(e)
+
+            return "Record Inserted"
+        else:
+            return "Records Have constraint errors3"

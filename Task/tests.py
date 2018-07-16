@@ -1,3 +1,5 @@
+import json
+
 from django.test import TestCase
 from .models import TaskEntry
 
@@ -82,8 +84,7 @@ class TestForTaskEntry(TestCase):
 
         response = self.client.get('/api/getTaskList')
         self.assertJSONEqual(response.content, {
-            "list": "[{'Task_id': '43', 'Task_des': 'dsas', 'Task_priority': 1, 'Task_weight': 2, 'Task_dependant': "
-                    "'None', 'Task_schedule': 1}]"})
+            "list": [{'Task_id': '43', 'Task_des': 'dsas', 'Task_priority': 1, 'Task_weight': 2, 'Task_dependant': 'None', 'Task_schedule': 1}]})
 
     def test_get_a_record(self):
         test_object = TaskEntry()
@@ -157,7 +158,7 @@ class TestForTaskEntry(TestCase):
                                 Task_dependant='NULL')
 
         response = self.client.post('/api/deleteTask',
-                                    {'Task_id': '43'})
+                                    json.dumps({'Task_id': '43'}))
         self.assertJSONEqual(response.content, {'status': 'success'})
         response = self.client.get('/api/getTask', {'Task_id': '43'})
         self.assertJSONEqual(response.content, {})

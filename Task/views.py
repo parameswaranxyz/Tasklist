@@ -15,13 +15,14 @@ def get_task_list(request):
         for each_items in task_list:
             jsonDic = {'Task_id': each_items.Task_id, 'Task_des': each_items.Task_des,
                        'Task_priority': each_items.Task_priority, 'Task_weight': each_items.Task_weight,
-                       'Task_dependant': str(each_items.Task_dependant), 'Task_schedule': each_items.Task_schedule}
+                       'Task_dependant': str(each_items.Task_dependant), 'Task_schedule': each_items.Task_schedule,
+                       'Task_created_on': str(each_items.Task_create)}
 
             all_task_list.append(jsonDic)
     else:
         all_task_list = ''
 
-    response = {'list': str(all_task_list)}
+    response = {'list': all_task_list}
 
     return HttpResponse(content=json.dumps(response), content_type="application/json")
 
@@ -36,7 +37,8 @@ def get_a_task_to_edit(request):
             for each_items in task:
                 jsonDic = {'Task_id': each_items.Task_id, 'Task_des': each_items.Task_des,
                            'Task_priority': each_items.Task_priority, 'Task_weight': each_items.Task_weight,
-                           'Task_dependant': str(each_items.Task_dependant), 'Task_schedule': each_items.Task_schedule}
+                           'Task_dependant': str(each_items.Task_dependant), 'Task_schedule': each_items.Task_schedule
+                           }
 
         else:
             jsonDic = {}
@@ -50,12 +52,13 @@ def add_a_record(request):
     response = {}
     if request.method == 'POST':
         new_record = TaskEntry()
-        if new_record.set_details(Task_id=str(request.POST.get("Task_id")),
-                                  Task_des=str(request.POST.get("Task_des")),
-                                  Task_priority=int(request.POST.get("Task_priority")),
-                                  Task_weight=int(request.POST.get("Task_weight")),
-                                  Task_schedule=int(request.POST.get("Task_schedule")),
-                                  Task_dependant=str(request.POST.get("Task_dependant"))
+        data = json.loads(request.body)
+        if new_record.set_details(Task_id=str(data.get("Task_id")),
+                                  Task_des=str(data.get("Task_des")),
+                                  Task_priority=int(data.get("Task_priority")),
+                                  Task_weight=int(data.get("Task_weight")),
+                                  Task_schedule=int(data.get("Task_schedule")),
+                                  Task_dependant=str(data.get("Task_dependant"))
                                   ) == "Record Inserted":
 
             response['status'] = 'success'
@@ -73,15 +76,16 @@ def add_a_record(request):
 def update_a_record(request):
     response = {}
     if request.method == 'POST':
-        if not TaskEntry.objects.filter(Task_id=str(request.POST.get("Task_id"))).count() == 0:
+        data = json.loads(request.body)
+        if not TaskEntry.objects.filter(Task_id=str(data.get("Task_id"))).count() == 0:
 
             new_record = TaskEntry()
-            if new_record.update_record(Task_id=str(request.POST.get("Task_id")),
-                                        Task_des=str(request.POST.get("Task_des")),
-                                        Task_priority=int(request.POST.get("Task_priority")),
-                                        Task_weight=int(request.POST.get("Task_weight")),
-                                        Task_schedule=int(request.POST.get("Task_schedule")),
-                                        Task_dependant=str(request.POST.get("Task_dependant"))
+            if new_record.update_record(Task_id=str(data.get("Task_id")),
+                                        Task_des=str(data.get("Task_des")),
+                                        Task_priority=int(data.get("Task_priority")),
+                                        Task_weight=int(data.get("Task_weight")),
+                                        Task_schedule=int(data.get("Task_schedule")),
+                                        Task_dependant=str(data.get("Task_dependant"))
                                         ) == "Record Inserted":
                 response['status'] = 'success'
             else:
@@ -98,8 +102,10 @@ def update_a_record(request):
 def delete_a_task(request):
     response = {}
     if request.method == 'POST':
-        if not TaskEntry.objects.filter(Task_id=request.POST.get("Task_id")).count() == 0:
-            task = TaskEntry.objects.filter(Task_id=request.POST.get("Task_id"))
+        data = json.loads(request.body)
+        # print(data.get("Task_id"))
+        if not TaskEntry.objects.filter(Task_id=data.get("Task_id")).count() == 0:
+            task = TaskEntry.objects.filter(Task_id=data.get("Task_id"))
             task.delete()
             response['status'] = 'success'
             return HttpResponse(json.dumps(response), content_type="application/json")
@@ -107,3 +113,10 @@ def delete_a_task(request):
             response['status'] = 'failed'
             return HttpResponse(json.dumps(response),
                                 content_type="application/json")
+
+
+# check
+def check(request):
+    if 'GET' == request.method:
+        response = {'list': "hai"}
+    return HttpResponse(content=json.dumps(response), content_type="application/json")

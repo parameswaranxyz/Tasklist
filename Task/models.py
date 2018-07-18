@@ -8,6 +8,7 @@ class TaskEntry(models.Model):
     Task_id = models.CharField(max_length=30,
                                error_messages={'incomplete': 'Enter a country calling code and a phone number.'},
                                primary_key=True)
+    # Task_id = models.AutoField(primary_key=True)
     Task_des = models.CharField(max_length=200)
     Task_priority = models.PositiveIntegerField(default=1,
                                                 validators=[MinValueValidator(1), MaxValueValidator(5)],

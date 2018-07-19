@@ -53,7 +53,7 @@ def add_a_record(request):
     if request.method == 'POST':
         new_record = TaskEntry()
         data = json.loads(request.body)
-        if new_record.set_details(Task_id=str(data.get("Task_id")),
+        if new_record.set_details(#Task_id=str(data.get("Task_id")),
                                   Task_des=str(data.get("Task_des")),
                                   Task_priority=int(data.get("Task_priority")),
                                   Task_weight=int(data.get("Task_weight")),
@@ -77,10 +77,10 @@ def update_a_record(request):
     response = {}
     if request.method == 'POST':
         data = json.loads(request.body)
-        if not TaskEntry.objects.filter(Task_id=str(data.get("Task_id"))).count() == 0:
+        if not TaskEntry.objects.filter(Task_id=data.get("Task_id")).count() == 0:
 
             new_record = TaskEntry()
-            if new_record.update_record(Task_id=str(data.get("Task_id")),
+            if new_record.update_record(Task_id=data.get("Task_id"),
                                         Task_des=str(data.get("Task_des")),
                                         Task_priority=int(data.get("Task_priority")),
                                         Task_weight=int(data.get("Task_weight")),

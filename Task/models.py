@@ -1,14 +1,12 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-import pytz
-import datetime
 
 
 class TaskEntry(models.Model):
-    Task_id = models.CharField(max_length=30,
-                               error_messages={'incomplete': 'Enter a country calling code and a phone number.'},
-                               primary_key=True)
-    # Task_id = models.AutoField(primary_key=True)
+
+    # id = models.AutoField(primary_key=True)
+
+    Task_id = models.AutoField(auto_created=True, primary_key=True)
     Task_des = models.CharField(max_length=200)
     Task_priority = models.PositiveIntegerField(default=1,
                                                 validators=[MinValueValidator(1), MaxValueValidator(5)],
@@ -16,13 +14,12 @@ class TaskEntry(models.Model):
                                                     'incomplete': 'Enter a country calling code and a phone number.'})
     Task_weight = models.PositiveIntegerField(default=1,
                                               validators=[MinValueValidator(1), MaxValueValidator(5)])
-    Task_dependant = models.ForeignKey('self', related_name="task", on_delete=models.CASCADE, null=True, blank=True)
+    Task_dependant = models.ForeignKey('self', on_delete=models.CASCADE, null=True,blank=True)
     Task_schedule = models.PositiveIntegerField(default=1,
                                                 validators=[MinValueValidator(1), MaxValueValidator(5)])
 
     Task_create = models.DateTimeField(auto_now_add=True,blank=True)
-    # datetime.datetime.utcnow().replace(tzinfo=utc)
-    #Task_create = models.DateTimeField(default=datetime.datetime.now(pytz.timezone('Asia/Kolkata')))
+
 
     MINIMUM_RANGE = 1
     MAXIMUM_RANGE = 5
@@ -31,28 +28,29 @@ class TaskEntry(models.Model):
     def __str(self):
         return self.name
 
-    def set_details(self, Task_id, Task_des, Task_priority, Task_weight, Task_schedule, Task_dependant):
-        self.Task_id = Task_id
+    # def set_details(self, Task_id, Task_des, Task_priority, Task_weight, Task_schedule, Task_dependant):
+    def set_details(self, Task_des, Task_priority, Task_weight, Task_schedule, Task_dependant):
+        # self.Task_id = Task_id
         self.Task_des = Task_des
         self.Task_priority = Task_priority
         self.Task_weight = Task_weight
         self.Task_schedule = Task_schedule
 
-        print("Date and time", datetime.datetime.now(pytz.timezone('Asia/Kolkata')))
+        # print("Date and time", datetime.datetime.now(pytz.timezone('Asia/Kolkata')))
         if not Task_dependant == 'NULL':
             if self.check_record_count_fk(Task_dependant):
                 self.Task_dependant_id = Task_dependant
             else:
                 return "Records Have constraint errors"
 
-        if self.check_record_count() \
-                and self.check_priority() \
-                and self.check_weight() \
-                and self.check_schedule():
+        # if self.check_record_count() \
+        if self.check_priority() \
+            and self.check_weight() \
+            and self.check_schedule():
 
             try:
                 self.save()
-            except:
+            except Exception as e:
                 return "Records Have constraint errors"
 
             return "Record Inserted"

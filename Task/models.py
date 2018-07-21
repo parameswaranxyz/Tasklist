@@ -1,5 +1,6 @@
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class TaskEntry(models.Model):
@@ -20,6 +21,7 @@ class TaskEntry(models.Model):
 
     Task_create = models.DateTimeField(auto_now_add=True,blank=True)
 
+    User = models.ForeignKey(User,on_delete=models.CASCADE)
 
     MINIMUM_RANGE = 1
     MAXIMUM_RANGE = 5

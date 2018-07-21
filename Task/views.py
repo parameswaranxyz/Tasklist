@@ -2,11 +2,58 @@ import json
 
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-
-from .models import TaskEntry
-
+from django.contrib.auth.models import User
+from django.contrib import auth
 
 # get all records
+from Task.models import TaskEntry
+from django.contrib.auth.decorators import login_required
+
+
+@csrf_exempt
+def user_auth(request):
+    response = {}
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        print(data['username'], data['password'],data)
+        try:
+            user = User.objects.get(username=data['username'])
+            response['status'] = 'failed'
+        except User.DoesNotExist:
+            User.objects.create_user(data['username'], password=data['password'])
+            response['status'] = 'success'
+    else:
+        response['status'] = 'failed'
+    return HttpResponse(content=json.dumps(response), content_type="application/json")
+
+
+@csrf_exempt
+def login(request):
+    response = {}
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        user = auth.authenticate(username=data['username'], password=data['password'])
+        if user is not None:
+            auth.login(request, user)
+            response['status'] = 'success'
+        else:
+            response['status'] = 'failed'
+    else:
+        response['status'] = 'failed'
+    return HttpResponse(content=json.dumps(response), content_type="application/json")
+
+
+@csrf_exempt
+def logout(request):
+    response = {}
+    if request.method == 'POST':
+        auth.logout(request)
+        response['status'] = 'success'
+    else:
+        response['status'] = 'failed'
+    return HttpResponse(content=json.dumps(response), content_type="application/json")
+
+@login_required
 def get_task_list(request):
     if request.method == 'GET':
         all_task_list = []
@@ -53,13 +100,13 @@ def add_a_record(request):
     if request.method == 'POST':
         new_record = TaskEntry()
         data = json.loads(request.body)
-        if new_record.set_details(#Task_id=str(data.get("Task_id")),
-                                  Task_des=str(data.get("Task_des")),
-                                  Task_priority=int(data.get("Task_priority")),
-                                  Task_weight=int(data.get("Task_weight")),
-                                  Task_schedule=int(data.get("Task_schedule")),
-                                  Task_dependant=str(data.get("Task_dependant"))
-                                  ) == "Record Inserted":
+        if new_record.set_details(  # Task_id=str(data.get("Task_id")),
+                Task_des=str(data.get("Task_des")),
+                Task_priority=int(data.get("Task_priority")),
+                Task_weight=int(data.get("Task_weight")),
+                Task_schedule=int(data.get("Task_schedule")),
+                Task_dependant=str(data.get("Task_dependant"))
+        ) == "Record Inserted":
 
             response['status'] = 'success'
         else:

@@ -10,4 +10,5 @@ urlpatterns = [
     path('api/createUser', views.user_auth, name='register user'),
     path('api/userLogin', views.login, name='login'),
     path('api/userLogout', views.logout, name='logout'),
+    path('api/getTaskListT',views.get_task_list_as_tree, name ='get all records'),
 ]

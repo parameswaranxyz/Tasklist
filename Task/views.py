@@ -97,11 +97,10 @@ def get_task_list_as_tree(request):
             print(new_node.data.Task_id, new_node.data.Task_dependant_id)
             tree.insert_child(tree.Root,new_node)
 
-        print("hai")
-        tree.print_tree(tree.Root)
-        print(tree.Root.children[0].children[0].children)
-        print(tree.Root.children[1].children[0].children[1].children)
-
+        # print("hai")
+        print(tree.print_tree(tree.Root))
+        # print(tree.Root.children[0].children[0].children)
+        # print(tree.Root.children[1].children[0].children[1].children)
 
 
     #         jsonDic = {'Task_id': each_items.Task_id, 'Task_des': each_items.Task_des,
@@ -211,3 +210,17 @@ def check(request):
     if 'GET' == request.method:
         response = {'list': "hai"}
     return HttpResponse(content=json.dumps(response), content_type="application/json")
+
+
+'''{ None None  None}
+[{   2 None dsadnasina 2018-07-20 07:46:14.876368+00:00  }[{11 2 check 2018-07-22 19:23:18.845614+00:00}]
+{4 None Task A 2018-07-22 17:07:38.180790+00:00}
+[{5 4 TaskB 2018-07-22 17:07:52.857980+00:00}[
+ {6 5 Taskc 2018-07-22 17:08:12.935603+00:00}[{7 6 Task D 2018-07-22 17:08:38.587325+00:00}]
+{8 5 Task 1 2018-07-22 17:08:54.666120+00:00}{9 5 Task 2 2018-07-22 17:09:18.497849+00:00}
+        [{10 9 Task 3 2018-07-22 17:09:37.744749+00:00}]
+        ]
+]
+]
+[]
+[]'''

@@ -7,7 +7,8 @@ from django.contrib import auth
 
 # get all records
 from Task.models import TaskEntry
-from .tree_view import Node,Tree
+from .tree_view import Node, Tree
+from operator import attrgetter
 
 from django.contrib.auth.decorators import login_required
 
@@ -17,7 +18,7 @@ def user_auth(request):
     response = {}
     if request.method == 'POST':
         data = json.loads(request.body)
-        print(data['username'], data['password'],data)
+        print(data['username'], data['password'], data)
         try:
             user = User.objects.get(username=data['username'])
             response['status'] = 'failed'
@@ -55,6 +56,7 @@ def logout(request):
         response['status'] = 'failed'
     return HttpResponse(content=json.dumps(response), content_type="application/json")
 
+
 # @login_required
 def get_task_list(request):
     if request.method == 'GET':
@@ -77,7 +79,6 @@ def get_task_list(request):
 
 
 def get_task_list_as_tree(request):
-
     # Parent search(root,new):
     #         If new_depen == None:
     #                 Return root                    // insert // root.child  = new_node
@@ -88,31 +89,17 @@ def get_task_list_as_tree(request):
     #                         Parent search(I,new)
 
     if request.method == 'GET':
-        all_task_list = []
         task_list = TaskEntry.objects.all()
         tree = Tree()
+
+        task_list = sorted(task_list, key=attrgetter('Task_id'))
 
         for each_items in task_list:
             new_node = Node(each_items)
             print(new_node.data.Task_id, new_node.data.Task_dependant_id)
-            tree.insert_child(tree.Root,new_node)
+            tree.insert_child(tree.Root, new_node)
 
-        # print("hai")
-        print(tree.print_tree(tree.Root))
-        # print(tree.Root.children[0].children[0].children)
-        # print(tree.Root.children[1].children[0].children[1].children)
-
-
-    #         jsonDic = {'Task_id': each_items.Task_id, 'Task_des': each_items.Task_des,
-    #                    'Task_priority': each_items.Task_priority, 'Task_weight': each_items.Task_weight,
-    #                    'Task_dependant': str(each_items.Task_dependant), 'Task_schedule': each_items.Task_schedule,
-    #                    'Task_created_on': str(each_items.Task_create)}
-    #
-    #         all_task_list.append(jsonDic)
-    # else:
-    #     all_task_list = ''
-    #
-    response = {'list': all_task_list}
+    response = {'list': tree.print_tree(tree.Root)}
 
     return HttpResponse(content=json.dumps(response), content_type="application/json")
 

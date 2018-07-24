@@ -26,18 +26,19 @@ class Tree:
 
     def print_tree(self, root):
         dic={}
-        dic['Task_id']=root.data.Task_id
-        dic['Task_des']=root.data.Task_des
-        dic['Task_priority']=root.data.Task_priority
-        dic['Task_weight']=root.data.Task_weight
-        dic['Task_dependant']=root.data.Task_dependant
-        dic['Task_dependant_id']=root.data.Task_dependant_id
-        dic['Task_create']=str(root.data.Task_create)
-        dic['children']=[]
+        dic["Task_id"]=str(root.data.Task_id)
+        dic["Task_des"]=str(root.data.Task_des)
+        dic["Task_priority"]=str(root.data.Task_priority)
+        dic["Task_weight"]=str(root.data.Task_weight)
+        dic["Task_dependant"]=str(root.data.Task_dependant)
+        dic["Task_dependant_id"]=str(root.data.Task_dependant_id)
+        dic["Task_create"]=str(root.data.Task_create)
+        dic["children"]=[]
         if len(root.children) > 0:
-
+            # dic['Task_weight'] = dic.get('Task_weight')
             for each_child in root.children:
-                dic['children'].append(self.print_tree(each_child))
+                dic.get("children").append(self.print_tree(each_child))
+                # dic['Task_weight']=dic.get('Task_weight')
 
         # print(dic)
         return dic

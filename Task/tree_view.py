@@ -33,6 +33,7 @@ class Tree:
         dic["Task_dependant"] = str(root.data.Task_dependant)
         dic["Task_dependant_id"] = str(root.data.Task_dependant_id)
         dic["Task_create"] = str(root.data.Task_create)
+        dic["Task_schedule"] = str(root.data.Task_schedule)
         dic["children"] = []
         if len(root.children) > 0:
             for each_child in root.children:

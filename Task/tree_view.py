@@ -40,5 +40,6 @@ class Tree:
                 dic.get("children").append(self.print_tree(each_child))
                 # dic['Task_weight']=dic.get('Task_weight')
 
+
         # print(dic)
         return dic

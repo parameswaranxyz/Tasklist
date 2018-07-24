@@ -79,24 +79,15 @@ def get_task_list(request):
 
 
 def get_task_list_as_tree(request):
-    # Parent search(root,new):
-    #         If new_depen == None:
-    #                 Return root                    // insert // root.child  = new_node
-    #         Else if root_id == new_dep:
-    #                 Return root                     // insert // root.child.ap(new_node)
-    #         Else if root.child.len>0:
-    #                 For i in root.child:
-    #                         Parent search(I,new)
 
     if request.method == 'GET':
         task_list = TaskEntry.objects.all()
         tree = Tree()
 
-        task_list = sorted(task_list, key=attrgetter('Task_id'))
+        task_list = sorted(task_list, key=attrgetter('Task_id')) #sorting before insert into the tree to avoid dependant collision
 
         for each_items in task_list:
             new_node = Node(each_items)
-            print(new_node.data.Task_id, new_node.data.Task_dependant_id)
             tree.insert_child(tree.Root, new_node)
 
     response = {'list': tree.print_tree(tree.Root)}
